@@ -1,15 +1,23 @@
 import type { BotConfig, TaskDefinition, TaskInstance } from "./types.js";
 import { isoWeekNumber, isoWeekday, assignedClerkUserIdForDay } from "./rotation.js";
+import { getISOWeekYear } from "date-fns";
+
+function toLocalYmd(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
 
 export function periodKeyForWeek(date: Date): string {
   const week = isoWeekNumber(date);
-  const year = date.getUTCFullYear();
+  const year = getISOWeekYear(date);
   return `${year}-W${String(week).padStart(2, "0")}`;
 }
 
 export function periodKeyForMonth(date: Date): string {
-  const year = date.getUTCFullYear();
-  const month = date.getUTCMonth() + 1;
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
   return `${year}-${String(month).padStart(2, "0")}`;
 }
 
@@ -37,7 +45,7 @@ export function monthlyTaskDefinitions(config: BotConfig): TaskDefinition[] {
 }
 
 export function buildDailyTaskInstances(config: BotConfig, date: Date): TaskInstance[] {
-  const dueDate = date.toISOString().slice(0, 10);
+  const dueDate = toLocalYmd(date);
   const assignee = assignedClerkUserIdForDay(config.rotation, date);
   const periodKey = periodKeyForWeek(date);
   return dailyTaskDefinitions(config).map((t) => ({
@@ -51,12 +59,28 @@ export function buildDailyTaskInstances(config: BotConfig, date: Date): TaskInst
 }
 
 export function buildWeeklyTaskInstances(config: BotConfig, weekDate: Date): TaskInstance[] {
+  const dueDate = toLocalYmd(weekDate);
   const assignee = assignedClerkUserIdForDay(config.rotation, weekDate);
   const periodKey = periodKeyForWeek(weekDate);
   return weeklyTaskDefinitions(config).map((t) => ({
-    id: `${periodKey}:${t.id}:${assignee}`,
+    id: `${periodKey}:${dueDate}:${t.id}:${assignee}`,
     taskDefinitionId: t.id,
     periodKey,
+    dueDate,
+    assignedToUserId: assignee,
+    status: "open"
+  }));
+}
+
+export function buildMonthlyTaskInstances(config: BotConfig, monthDate: Date): TaskInstance[] {
+  const dueDate = toLocalYmd(monthDate);
+  const assignee = assignedClerkUserIdForDay(config.rotation, monthDate);
+  const periodKey = periodKeyForMonth(monthDate);
+  return monthlyTaskDefinitions(config).map((t) => ({
+    id: `${periodKey}:${dueDate}:${t.id}:${assignee}`,
+    taskDefinitionId: t.id,
+    periodKey,
+    dueDate,
     assignedToUserId: assignee,
     status: "open"
   }));

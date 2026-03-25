@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build shared package
+        run: npm -w @clerkbot/shared run build
+
+      - name: Build admin UI
+        env:
+          NEXTAUTH_URL: http://localhost:3000
+          NEXTAUTH_SECRET: ci-secret
+          ENTRA_ID_CLIENT_ID: ci-client
+          ENTRA_ID_CLIENT_SECRET: ci-secret
+          ENTRA_ID_TENANT_ID: ci-tenant
+          ADMIN_ENTRA_OBJECT_IDS: ""
+          CLERKBOT_API_BASE_URL: http://localhost:7071
+        run: npm -w @clerkbot/admin-ui run build
+
+      - name: Build bot package (tsc)
+        run: npm -w @clerkbot/bot run build
+

@@ -7,10 +7,13 @@
     "build": "tsc -p tsconfig.json",
     "dev": "func start"
   },
+  "main": "dist/index.js",
   "dependencies": {
     "@azure/data-tables": "^14.0.0",
     "@azure/functions": "^4.6.0",
     "@clerkbot/shared": "workspace:*",
+    "date-holidays": "^3.26.11",
+    "date-fns-tz": "^3.2.0",
     "botbuilder": "^4.23.2",
     "jose": "^6.0.0",
     "uuid": "^11.1.0"

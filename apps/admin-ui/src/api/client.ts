@@ -3,9 +3,16 @@ import type { BotConfig } from "@clerkbot/shared";
 
 const BotConfigSchema = z.any();
 
+function withFunctionKey(url: string): string {
+  const key = process.env.CLERKBOT_API_FUNCTION_KEY;
+  if (!key) return url;
+  const join = url.includes("?") ? "&" : "?";
+  return `${url}${join}code=${encodeURIComponent(key)}`;
+}
+
 export async function fetchConfig(): Promise<BotConfig> {
   const base = process.env.CLERKBOT_API_BASE_URL!;
-  const res = await fetch(`${base}/api/config`, { cache: "no-store" });
+  const res = await fetch(withFunctionKey(`${base}/api/config`), { cache: "no-store" });
   if (!res.ok) throw new Error(`Failed to fetch config: ${res.status}`);
   const json = await res.json();
   BotConfigSchema.parse(json);
@@ -14,7 +21,7 @@ export async function fetchConfig(): Promise<BotConfig> {
 
 export async function updateConfig(config: BotConfig): Promise<void> {
   const base = process.env.CLERKBOT_API_BASE_URL!;
-  const res = await fetch(`${base}/api/config`, {
+  const res = await fetch(withFunctionKey(`${base}/api/config`), {
     method: "PUT",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(config)
