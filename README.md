@@ -1,5 +1,7 @@
 ## Teams Clerk Bot (Teams + Admin UI)
 
+**Resume work / where chats live:** see [CONTINUITY.md](CONTINUITY.md) and [PROJECT_GOALS.md](PROJECT_GOALS.md). Cursor project rules live in `.cursor/rules/`.
+
 This repo contains:
 
 - `apps/bot`: Microsoft Teams bot (Bot Framework) intended for Azure Functions hosting.

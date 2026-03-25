@@ -1,0 +1,16 @@
+---
+description: Dukse Bot / Teams Clerk Bot – project context for Cursor
+globs:
+  - "**/*"
+alwaysApply: true
+---
+
+# Dukse Bot (Teams Clerk Bot)
+
+- **Goals and MVP:** Read `PROJECT_GOALS.md` and `CONTINUITY.md` at repo root.
+- **Monorepo:** npm workspaces — `apps/bot` (Azure Functions + Bot Framework), `apps/admin-ui` (Next.js + Entra SSO), `packages/shared` (types, rotation, task helpers).
+- **Data:** Azure Table Storage for config, task instances, conversation references, audit/de-dup rows. Env vars in each app’s `.env.example`.
+- **Conventions:** Match existing TypeScript style; avoid drive-by refactors; do not edit `.cursor/plans/` or user plan files unless asked.
+- **User context:** Europe/Copenhagen, weekdays-only reminders, Danish holidays skip dailies; weekly tasks due Monday (or next working day); shared ISO weeks for two clerks with weekday split.
+
+When unsure, prefer small, testable changes and update README or PROJECT_GOALS only if the user asks or behavior changes materially.
