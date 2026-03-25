@@ -1,0 +1,13 @@
+{
+  "name": "teams-clerk-bot",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "lint": "echo \"Add lint tooling if desired\"",
+    "typecheck": "echo \"Run typecheck in CI\""
+  }
+}
+
